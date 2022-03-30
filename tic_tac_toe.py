@@ -1,5 +1,8 @@
 def tic_tac_toe_winner(board: str):
     b = board.lower()
+    if (b.count("x") - b.count("o"))**2 > 1:
+        raise ValueError
+
     row_1 = b[:3]
     row_2 = b[3:6]
     row_3 = b[6:]
@@ -15,39 +18,25 @@ def tic_tac_toe_winner(board: str):
     columns = [column_1, column_2, column_3]
     diagonals = [diagonal_1, diagonal_2]
 
+    result = ""
     for row in rows:
         if row == "xxx":
-            return "x"
+            result += "x"
         elif row == "ooo":
-            return "o"
+            result += "o"
     for column in columns:
         if column == "xxx":
-            return "x"
+            result += "x"
         elif column == "ooo":
-            return "o"
+            result += "o"
     for diagonal in diagonals:
         if diagonal == "xxx":
-            return "x"
+            result += "x"
         elif diagonal == "ooo":
-            return "o"
-    return None
+            result += "o"
 
+    if len(result) > 1:
+        raise ValueError
 
-if __name__ == '__main__':
-    test_cases = {
-        'XO  X O X': 'x',
-        'OX  O X O': 'o',
-        'XXOOXXXOO': None,
-        'xxx o o  ': 'x',
-        'x  ooo x ': 'o',
-        'xo x  xo ': 'x',
-        ' xo xo  o': 'o',
-        'xo ox   x': 'x',
-        'x oxo ox ': 'o',
-        'xx   oo  ': None,
-        '         ': None,
-    }
+    return result if result != "" else None
 
-    for board, expectation in test_cases.items():
-        response = tic_tac_toe_winner(board)
-        assert response == expectation, f'Expected = {expectation}, got = {response}'
