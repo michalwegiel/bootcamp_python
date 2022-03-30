@@ -1,5 +1,12 @@
 def tic_tac_toe_winner(board: str):
+    if type(board) is not str:
+        raise ValueError
+    if len(board) != 9:
+        raise ValueError
     b = board.lower()
+    for i in b:
+        if i not in "xo ":
+            raise ValueError
     if (b.count("x") - b.count("o"))**2 > 1:
         raise ValueError
 
