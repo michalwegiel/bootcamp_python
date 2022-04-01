@@ -6,6 +6,6 @@ def is_palindrome(data):
     for letter in data:
         if letter.isalpha():
             d += letter
-    d = d.lower().replace(" ", "")
+    d = d.lower()
     return d == d[::-1]
 
