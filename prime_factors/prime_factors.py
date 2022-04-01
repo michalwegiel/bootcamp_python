@@ -6,13 +6,6 @@ def factors(n):
         yield i
 
 
-def multiply_array(arr):
-    result = 1
-    for i in arr:
-        result *= i
-    return result
-
-
 def prime_factors(number):
     if type(number) is not int or number < 2:
         raise ValueError
@@ -20,9 +13,11 @@ def prime_factors(number):
     factors_gen = factors(number)
     actual_factor = next(factors_gen)
     temp = number
-    while multiply_array(prime_factors_list) != number:
+    multi_array = 1
+    while multi_array != number:
         if temp % actual_factor == 0:
             prime_factors_list.append(actual_factor)
+            multi_array *= actual_factor
             temp = temp/actual_factor
         else:
             actual_factor = next(factors_gen)
