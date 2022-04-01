@@ -1,13 +1,9 @@
-def prime_generator(n):
-    def is_prime(number_to_check):
-        for i in range(2, number_to_check - 1):
-            if number_to_check % i == 0:
-                return False
-        return True
-
-    for number in range(2, n + 1):
-        if is_prime(number):
-            yield number
+def factors(n):
+    yield 2
+    i = 1
+    while i < n:
+        i += 2
+        yield i
 
 
 def prime_factors(number):
@@ -18,14 +14,16 @@ def prime_factors(number):
         return result
 
     prime_factors_list = []
-    prime_number_generator = prime_generator(number)
-    actual_prime_number = next(prime_number_generator)
+    factors_gen = factors(number)
+    actual_factor = next(factors_gen)
     temp = number
     while multiply_array(prime_factors_list) != number:
-        if temp % actual_prime_number == 0:
-            prime_factors_list.append(actual_prime_number)
-            temp = temp/actual_prime_number
+        if temp % actual_factor == 0:
+            prime_factors_list.append(actual_factor)
+            temp = temp/actual_factor
         else:
-            actual_prime_number = next(prime_number_generator)
+            actual_factor = next(factors_gen)
 
     return prime_factors_list
+
+
