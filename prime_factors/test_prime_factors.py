@@ -10,6 +10,12 @@ class TestPrimeFactors(unittest.TestCase):
         for input_value, expected in zip(input_values, expected_outputs):
             assert expected == prime_factors(input_value)
 
+    def test_prime_factors_negative(self):
+        input_values = [4.3, "abcd", -1, [], {}]
+        for input_value in input_values:
+            with self.assertRaises(ValueError):
+                prime_factors(input_value)
+
 
 if __name__ == '__main__':
     unittest.main()
