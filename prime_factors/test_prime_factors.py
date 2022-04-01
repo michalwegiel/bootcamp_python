@@ -11,11 +11,18 @@ class TestPrimeGenerator(unittest.TestCase):
         assert prime_numbers == outputs[1]
 
 
-
 class TestPrimeFactors(unittest.TestCase):
 
     def test_prime_factors(self):
-        assert True
+        """
+        2 -> [2]
+        6 -> [2, 3]
+        8 -> [2, 2, 2]
+        """
+        input_values = [2, 6, 8]
+        expected_outputs = [[2], [2, 3], [2, 2, 2]]
+        for input_value, expected in zip(input_values, expected_outputs):
+            assert expected == prime_factors(input_value)
 
 
 if __name__ == '__main__':
