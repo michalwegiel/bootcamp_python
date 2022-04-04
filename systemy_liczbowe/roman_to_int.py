@@ -12,6 +12,10 @@ def roman_to_int(roman: str) -> int:
     11
     >>> roman_to_int("L")
     50
+    >>> roman_to_int("")
+    ValueError: Input value must be string and valid roman number
+    >>> roman_to_int("IIII")
+    ValueError: Input value must be string and valid roman number
     """
     symbols: Dict[str, int] = {
         'I': 1,
