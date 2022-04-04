@@ -46,6 +46,10 @@ def test_roman_to_negative():
         {"I": 1},
         None,
         "",
+        "IIV",
+        "XXXX",
+        "MCMC",
+        "String",
     ]
     for scenario in scenarios:
         with pytest.raises(ValueError):
