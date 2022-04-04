@@ -36,3 +36,17 @@ def test_roman_to_int_advanced_scenarios():
     }
     for k, v in scenarios.items():
         assert roman_to_int(k) == v
+
+
+def test_roman_to_negative():
+    scenarios = {
+        1: ValueError,
+        2.4: ValueError,
+        [1, 2]: ValueError,
+        {"I": 1}: ValueError,
+        None: ValueError,
+        "": ValueError,
+    }
+    for k, v in scenarios.items():
+        with pytest.raises:
+            assert roman_to_int(k) == v
