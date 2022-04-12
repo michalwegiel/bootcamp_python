@@ -7,7 +7,7 @@ db = SQLAlchemy()
 DB_NAME = "database.db"
 
 
-def create_app():
+def create_app(reset_database=False):
     app = Flask(__name__)
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'
@@ -20,8 +20,8 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
-    from .models import User, Note
-    create_database(app)
+    from .models import User
+    create_database(app, reset_database)
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
@@ -34,7 +34,10 @@ def create_app():
     return app
 
 
-def create_database(app):
+def create_database(app, reset_database=False):
     if not path.exists('website/' + DB_NAME):
         db.create_all(app=app)
-        print("Created Database!")
+    if reset_database:
+        db.drop_all(app=app)
+        db.create_all(app=app)
+
