@@ -3,12 +3,20 @@ import pytest
 from unittest.mock import Mock
 from website import views
 
+
 @pytest.fixture
 def client():
     flask_app = create_app(reset_database=True)
     flask_app.config["TESTING"] = True
     with flask_app.test_client() as test_client:
         yield test_client
+
+
+@pytest.fixture
+def set_api_mock(monkeypatch):
+    api = Mock(return_value={'login': 'some_random_login', 'id': 'id1234id'})
+    monkeypatch.setattr(views, 'get_github_info', api)
+    return api
 
 
 def login(client, email, password):
@@ -125,20 +133,20 @@ def test_sign_up_page_get(client):
     assert expected_html in response.data
 
 
-def test_sign_up(client):
+def test_sign_up(client, set_api_mock):
     response = sign_up(client)
     assert response.status_code == 200
     assert b"Account created!" in response.data
 
 
-def test_logout(client):
+def test_logout(client, set_api_mock):
     sign_up(client)
     response = logout(client)
     assert response.status_code == 200
     assert b"Logged out!" in response.data
 
 
-def test_login(client):
+def test_login(client, set_api_mock):
     sign_up(client)
     logout(client)
     response = login(client, email='mich@mich.com', password='1234567')
@@ -146,10 +154,34 @@ def test_login(client):
     assert b"Logged in successfully!" in response.data
 
 
-def test_api(client, monkeypatch) -> None:
-    api = Mock(return_value={'login': 'some_random_login', 'id': 'id1234id'})
-    monkeypatch.setattr(views, 'get_github_info', api)
+def test_api(client, set_api_mock) -> None:
     response = sign_up(client)
     assert response.status_code == 200
     assert b"<td>some_random_login</td>" in response.data
     assert b"<td>id1234id</td>" in response.data
+    set_api_mock.assert_called()
+
+
+def test_home_page_negative(client):
+    response = client.get('/')
+    assert response.status_code == 302
+    assert b"You should be redirected automatically to target URL: <a href=\"/login?next=%2F\">/login?next=%2F</a>" in response.data
+
+
+def test_sign_up_negative_email_already_exists(client, set_api_mock):
+    signing_up = sign_up(client, email='michal123@gmail.com', first_name='Mich', github='github_user', password1='1234567', password2='1234567')
+    assert b"Account created!" in signing_up.data
+    logging_out = logout(client)
+    assert b"Logged out!" in logging_out.data
+    response = sign_up(client, email='michal123@gmail.com', first_name='Adam', github='github_user_2', password1='abcdefgh', password2='abcdefgh')
+    assert 200 == response.status_code
+    assert b"Email already exists." in response.data
+
+
+def test_sign_up_negative_email_too_short(client):
+    response = sign_up(client, email='m@', first_name='Mich', github='github_user', password1='1234567', password2='1234567')
+    assert 200 == response.status_code
+    assert b"Not valid email" in response.data
+
+
+
