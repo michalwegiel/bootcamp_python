@@ -169,19 +169,95 @@ def test_home_page_negative(client):
 
 
 def test_sign_up_negative_email_already_exists(client, set_api_mock):
-    signing_up = sign_up(client, email='michal123@gmail.com', first_name='Mich', github='github_user', password1='1234567', password2='1234567')
+    signing_up = sign_up(client, email='michal123@gmail.com', first_name='Mich', github='github_user',
+                         password1='1234567', password2='1234567')
     assert b"Account created!" in signing_up.data
     logging_out = logout(client)
     assert b"Logged out!" in logging_out.data
-    response = sign_up(client, email='michal123@gmail.com', first_name='Adam', github='github_user_2', password1='abcdefgh', password2='abcdefgh')
+    response = sign_up(client, email='michal123@gmail.com', first_name='Adam', github='github_user_2',
+                       password1='abcdefgh', password2='abcdefgh')
     assert 200 == response.status_code
     assert b"Email already exists." in response.data
 
 
 def test_sign_up_negative_email_too_short(client):
-    response = sign_up(client, email='m@', first_name='Mich', github='github_user', password1='1234567', password2='1234567')
+    response = sign_up(client, email='m@', first_name='Mich', github='github_user', password1='1234567',
+                       password2='1234567')
     assert 200 == response.status_code
-    assert b"Not valid email" in response.data
+    assert b"Not valid email." in response.data
 
 
+def test_sign_up_negative_first_name_too_short(client):
+    response = sign_up(client, email='michal@gmail.com', first_name='M', github='github_user', password1='1234567',
+                       password2='1234567')
+    assert 200 == response.status_code
+    assert b"First name must be greater than 1 character." in response.data
 
+
+def test_sign_up_negative_not_matching_passwords(client):
+    attempt_1 = sign_up(
+        client,
+        email='michal@gmail.com',
+        first_name='Michal',
+        github='github_user',
+        password1='1234567',
+        password2='12345678',
+    )
+    assert 200 == attempt_1.status_code
+    assert b"Passwords do not match." in attempt_1.data
+    attempt_2 = sign_up(
+        client,
+        email='michal@gmail.com',
+        first_name='Michal',
+        github='github_user',
+        password1='0234567',
+        password2='1234567',
+    )
+    assert 200 == attempt_2.status_code
+    assert b"Passwords do not match." in attempt_2.data
+
+
+def test_sign_up_negative_password_too_short(client):
+    response = sign_up(
+        client,
+        email='michal@gmail.com',
+        first_name='Michal',
+        github='github_user',
+        password1='abcd',
+        password2='abcd',
+    )
+    assert 200 == response.status_code
+    assert b"Password must be at least 7 characters." in response.data
+
+
+def test_logging_in_negative_email_does_not_exist(client, set_api_mock):
+    signing_up = sign_up(client, email='michal123@gmail.com', first_name='Mich', github='github_user',
+                         password1='1234567', password2='1234567')
+    assert b"Account created!" in signing_up.data
+    logging_out = logout(client)
+    assert b"Logged out!" in logging_out.data
+    response = login(client, email='adam@gmail.com', password='1234567')
+    assert 200 == response.status_code
+    assert b"Email does not exist." in response.data
+
+
+def test_logging_in_negative_incorrect_password(client, set_api_mock):
+    signing_up = sign_up(client, email='michal123@gmail.com', first_name='Mich', github='github_user',
+                         password1='1234567', password2='1234567')
+    assert b"Account created!" in signing_up.data
+    logging_out = logout(client)
+    assert b"Logged out!" in logging_out.data
+    response = login(client, email='michal123@gmail.com', password='12345678')
+    assert 200 == response.status_code
+    assert b"Invalid password, try again!" in response.data
+
+
+def test_logging_in_negative_empty_login_form(client, set_api_mock):
+    signing_up = sign_up(client, email='michal123@gmail.com', first_name='Mich', github='github_user',
+                         password1='1234567', password2='1234567')
+    assert b"Account created!" in signing_up.data
+    logging_out = logout(client)
+    assert b"Logged out!" in logging_out.data
+    response = login(client, email='', password='')
+    assert 200 == response.status_code
+    assert b"Email does not exist." in response.data
