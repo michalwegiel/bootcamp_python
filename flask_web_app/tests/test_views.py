@@ -260,4 +260,7 @@ def test_logging_in_negative_empty_login_form(client, set_api_mock):
     assert b"Logged out!" in logging_out.data
     response = login(client, email='', password='')
     assert 200 == response.status_code
-    assert b"Email does not exist." in response.data
+    assert b"Email form cannot be empty! Enter email and try again." in response.data
+    response = login(client, email='michal123@gmail.com', password='')
+    assert 200 == response.status_code
+    assert b"Password form cannot be empty! Enter password and try again." in response.data

@@ -12,17 +12,22 @@ def login():
     email = request.form.get('email')
     password = request.form.get('password')
 
-    if request.method == 'POST':
-        user = User.query.filter_by(email=email).first()
-        if user:
-            if check_password_hash(user.password, password):
-                flash('Logged in successfully!', category='success')
-                login_user(user, remember=True)
-                return redirect(url_for('views.home'))
+    if email == "":
+        flash('Email form cannot be empty! Enter email and try again.', category='error')
+    elif password == "":
+        flash('Password form cannot be empty! Enter password and try again.', category='error')
+    else:
+        if request.method == 'POST':
+            user = User.query.filter_by(email=email).first()
+            if user:
+                if check_password_hash(user.password, password):
+                    flash('Logged in successfully!', category='success')
+                    login_user(user, remember=True)
+                    return redirect(url_for('views.home'))
+                else:
+                    flash('Invalid password, try again!', category='error')
             else:
-                flash('Invalid password, try again!', category='error')
-        else:
-            flash('Email does not exist.', category='error')
+                flash('Email does not exist.', category='error')
 
     return render_template("login.html", user=current_user)
 
