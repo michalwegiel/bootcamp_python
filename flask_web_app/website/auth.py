@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import User
+from .models import User, add_user_to_database
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db
 from flask_login import login_user, login_required, logout_user, current_user
 
 auth = Blueprint('auth', __name__)
@@ -70,8 +69,7 @@ def sign_up():
                     github=github,
                     password=generate_password_hash(password1, method='sha256'),
                 )
-                db.session.add(new_user)
-                db.session.commit()
+                add_user_to_database(new_user)
                 flash('Account created!', category='success')
                 login_user(new_user, remember=True)
                 return redirect(url_for('views.home'))
